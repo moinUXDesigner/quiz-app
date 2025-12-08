@@ -1,0 +1,150 @@
+     :root {
+         --card-bg: #ffffff;
+     }
+
+     [data-bs-theme="dark"] {
+         --card-bg: #1f2937;
+     }
+
+     body {
+         background: #f8f9fa;
+     }
+
+     .card {
+         background: var(--card-bg);
+     }
+
+     .correct {
+         border-left: 4px solid #198754 !important;
+     }
+
+     .incorrect {
+         border-left: 4px solid #dc3545 !important;
+     }
+
+     .flagged {
+         box-shadow: inset 0 0 0 3px rgba(255, 193, 7, 0.12);
+     }
+
+     .option-label {
+         cursor: pointer;
+     }
+
+     .question-dot {
+         width: 30px;
+         height: 30px;
+         border-radius: 50%;
+         display: inline-block;
+         margin: 2px;
+         font-size: 0.6rem;
+     }
+
+     .dot-unanswered {
+         background: #e9ecef;
+     }
+
+     .dot-answered {
+         background: #198754;
+         color: #fff;
+     }
+
+     .dot-wrong {
+         background: #dc3545;
+     }
+
+     .dot-flagged {
+         background: #ffc107;
+     }
+
+     .controls-row {
+         gap: 8px;
+     }
+
+     /* Responsive smaller controls */
+     @media (max-width:576px) {
+         .controls-row {
+             flex-direction: column;
+         }
+     }
+
+     /* Pulse for < 10 sec */
+     @keyframes pulseWarning {
+         0% {
+             transform: scale(1);
+             opacity: 1;
+         }
+
+         50% {
+             transform: scale(1.08);
+             opacity: 0.6;
+         }
+
+         100% {
+             transform: scale(1);
+             opacity: 1;
+         }
+     }
+
+     .pulse-danger {
+         animation: pulseWarning 0.8s ease-in-out infinite;
+     }
+
+     /* Faster pulse + flash + shake for last 5 sec */
+     @keyframes pulseCritical {
+         0% {
+             transform: scale(1);
+             opacity: 1;
+         }
+
+         25% {
+             transform: scale(1.12);
+             opacity: 0.5;
+         }
+
+         50% {
+             transform: scale(1.18);
+             opacity: 1;
+         }
+
+         75% {
+             transform: scale(1.12);
+             opacity: 0.5;
+         }
+
+         100% {
+             transform: scale(1);
+             opacity: 1;
+         }
+     }
+
+     @keyframes shakeSide {
+
+         0%,
+         100% {
+             transform: translateX(0);
+         }
+
+         20% {
+             transform: translateX(-3px);
+         }
+
+         40% {
+             transform: translateX(3px);
+         }
+
+         60% {
+             transform: translateX(-3px);
+         }
+
+         80% {
+             transform: translateX(3px);
+         }
+     }
+
+     .pulse-critical {
+         animation: pulseCritical 0.45s ease-in-out infinite;
+     }
+
+     .shake-critical {
+         animation: shakeSide 0.45s ease-in-out infinite;
+     }

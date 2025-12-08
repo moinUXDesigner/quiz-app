@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Health Psychology MCQ Quiz — Upgraded</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- jsPDF + html2canvas for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Custom CSS -->
+     <link rel="stylesheet" href="assets/css/quiz-styles.css">
+    
+  </head>
+  <body>
+    <div class="container-fluid py-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-11 col-lg-10">
+
+          <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+              
+              <div class="row g-3 align-items-center">
+                <h6 class="col-7">Health Psychology</h6>
+                <!-- <div class="col-12 col-md-8">
+                  <small class="text-muted">Choose question groups to include in the quiz, enable timer if needed, then click <strong>Start Quiz</strong>.</small>
+                </div> -->
+                <div class="col-5 text-end">
+                  <!-- <div class="form-check form-switch d-inline-block me-2">
+                    <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                    <label class="form-check-label small" for="darkModeToggle">Dark Mode</label>
+                  </div> -->
+                  <!-- <button id="exportPdfBtn" class="btn btn-outline-primary btn-sm">Export Results (PDF)</button> -->
+                  
+                  <!-- Button trigger modal -->
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Load Quiz
+                  </button>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          
+
+          <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Setup panel -->
+           <div class="card mb-3">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-12">
+                  <h6>1) Select Groups <button id="startBtn" class="btn btn-success" data-bs-dismiss="modal">Start Quiz</button></h6>
+                  <div id="groupList" class="mb-2"></div>
+                  <div class="form-check">
+                    <input type="checkbox" id="selectAllGroups" class="form-check-input">
+                    <label class="form-check-label" for="selectAllGroups">Select All Groups</label>
+                  </div>
+                   
+                </div>
+
+                <div class="col-12 col-lg-6">
+                  <h6>2) Timer (optional)</h6>
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="enableTimer">
+                    <label class="form-check-label" for="enableTimer">Enable Timer</label>
+                  </div>
+                  <div class="d-flex gap-2 align-items-center">
+                    <select id="timerSelect" class="form-select w-50" disabled>
+                      <option value="300">5 minutes</option>
+                      <option value="600">10 minutes</option>
+                      <option value="1200">20 minutes</option>
+                      <option value="1800">30 minutes</option>
+                      <option value="0">Custom (enter seconds)</option>
+                    </select>
+                    <input id="timerCustom" class="form-control w-50" type="number" min="10" placeholder="seconds" disabled>
+                  </div>
+                </div>
+              </div>
+
+              <!-- <div class="mt-3">
+                <button id="startBtn" class="btn btn-success">Start Quiz</button>
+                <button id="loadAllBtn" class="btn btn-outline-secondary">Load All Groups</button>
+              </div> -->
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button> -->
+        
+        <button id="startBtn" class="btn btn-success" data-bs-dismiss="modal">Start Quiz</button>
+        <button id="loadAllBtn" class="btn btn-outline-secondary">Load All Groups</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+          
+
+          <!-- Quiz area -->
+          <div id="quizArea" style="display:none;">
+
+                      <!-- ICON RIBBON TOOLBAR -->
+                      <div class="card mb-3 sticky-top">
+                        <div class="card-body d-block d-sm-flex justify-content-between">
+                      
+                          <!-- Ribbon Row -->
+                          <div class="d-flex flex-wrap align-items-center gap-3">
+                      
+                      
+                      
+                            <!-- Ribbon Buttons -->
+                      
+                            <button id="shuffleBtn" class="btn btn-light border btn-sm" data-bs-toggle="tooltip"
+                              data-bs-title="Shuffle Questions">
+                              <i class="bi bi-shuffle"></i>
+                            </button>
+                      
+                            <button id="showAnswersBtn" class="btn btn-light border btn-sm" data-bs-toggle="tooltip"
+                              data-bs-title="Show Correct Answers">
+                              <i class="bi bi-check2-circle"></i>
+                            </button>
+                      
+                            <button id="resetBtn" class="btn btn-light border btn-sm" data-bs-toggle="tooltip" data-bs-title="Reset Quiz">
+                              <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                      
+                            <button id="flagJumpBtn" class="btn btn-light border btn-sm" data-bs-toggle="tooltip"
+                              data-bs-title="Jump to First Flagged Question">
+                              <i class="bi bi-flag-fill text-warning"></i>
+                            </button>
+                      
+                            <button id="progressBtn2" class="btn btn-light border btn-sm" type="button" data-bs-toggle="offcanvas"
+                              data-bs-target="#dotGridCanvasSlide" aria-controls="dotGridCanvasSlide">
+                              <i class="bi bi-person text-warning" data-bs-toggle="" data-bs-title="Progress Offcanvas"></i>
+                            </button>
+                      
+                      
+                      
+                      
+                            <!-- Filter Toggle Button (mobile only) -->
+                            <button class="btn btn-dark btn-sm d-sm-none ms-auto" data-bs-toggle="collapse" data-bs-target="#filterRibbon"
+                              data-bs-title="Show Filters">
+                              <i class="bi bi-funnel-fill"></i>
+                            </button>
+                          </div>
+                      
+                          <!-- Filter Section (collapsible on phones) -->
+                          <div id="filterRibbon" class="collapse d-sm-block mt-3">
+                      
+                            <div class="d-flex flex-wrap gap-4">
+                      
+                              <!-- FILTER CHECKBOXES WITH ICONS -->
+                              <div class="d-flex flex-column flex-sm-row gap-2">
+                      
+                                <div class="form-check d-flex align-items-center gap-2">
+                                  <input type="checkbox" id="filterAnswered" class="form-check-input">
+                                  <label class="form-check-label small" for="filterAnswered">
+                                    <i class="bi bi-check2-square text-success"></i> Answered
+                                  </label>
+                                </div>
+                      
+                                <div class="form-check d-flex align-items-center gap-2">
+                                  <input type="checkbox" id="filterNotAnswered" class="form-check-input">
+                                  <label class="form-check-label small" for="filterNotAnswered">
+                                    <i class="bi bi-square text-secondary"></i> Not Answered
+                                  </label>
+                                </div>
+                      
+                                <div class="form-check d-flex align-items-center gap-2">
+                                  <input type="checkbox" id="filterFlagged" class="form-check-input">
+                                  <label class="form-check-label small" for="filterFlagged">
+                                    <i class="bi bi-flag-fill text-warning"></i> Flagged
+                                  </label>
+                                </div>
+                      
+                                <div class="form-check d-flex align-items-center gap-2">
+                                  <input class="form-check-input" type="checkbox" id="filterWrong">
+                                  <label class="form-check-label small" for="filterWrong">
+                                    <i class="bi bi-x-circle-fill text-danger"></i> Wrong Answers
+                                  </label>
+                                </div>
+                      
+                              </div>
+                      
+                              <!-- Filter Action Buttons, also icons -->
+                              <div class="d-flex flex-column flex-sm-row gap-2">
+                      
+                                <button id="applyFilters" class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                  data-bs-title="Apply Filters">
+                                  <i class="bi bi-sliders"></i>
+                                </button>
+                      
+                                <button id="clearFilters" class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip"
+                                  data-bs-title="Clear Filters">
+                                  <i class="bi bi-backspace-fill"></i>
+                                </button>
+                      
+                              </div>
+                      
+                            </div>
+                      
+                          </div>
+                      
+                        </div>
+                      </div>
+
+                      <div class="offcanvas offcanvas-start" tabindex="-1" id="dotGridCanvasSlide" aria-labelledby="dotGridCanvasSlideLabel">
+                      <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="dotGridCanvasSlideLabel">Progress</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                      </div>
+                      <div class="offcanvas-body">
+                         <div class="col-sm-12">
+                      <!-- Progress Badge -->
+                            <div id="progressSummary" class="px-3 py-1 fw-semibold border rounded small text-center">
+                              0 / 0
+                            </div>
+                      <div class="text-center">
+                        <div id="dotGrid" class="mt-2"></div>
+                      </div>
+                    </div>
+                      </div>
+                    </div>
+
+            <div class="container-fluid">
+                  <div class="row">
+                    <div class="col-sm-12 newRibbon">
+                      
+
+                    </div>
+                    
+                   
+
+                    
+
+                    
+                    <!-- <div class="col-sm-3 d-flex flex-column">
+                    
+                      <div class="card px-3">
+                        <div id="progressSummary" class="my-3 border text-center px-2 py-1 fw-semibold" style="font-size: 0.7rem;">Progress:
+                          0 / 0 answered • Flagged: 0</div>
+                        <button id="shuffleBtn" class="btn btn-primary mb-3">Shuffle Questions</button>
+                        <button id="showAnswersBtn" class="btn btn-outline-info mb-3">Show Answers</button>
+                        <button id="resetBtn" class="btn btn-outline-secondary mb-3">Reset</button>
+                        <button id="flagJumpBtn" class="btn btn-outline-warning mb-3">Jump to Flagged</button>
+                      </div>
+                    
+                    
+                      <div class="card p-3 my-3">
+                        <h6>Filter Questions</h6>
+                    
+                        <div class="form-check">
+                          <input type="checkbox" id="filterAnswered" class="form-check-input">
+                          <label class="form-check-label" for="filterAnswered">Answered</label>
+                        </div>
+                    
+                        <div class="form-check">
+                          <input type="checkbox" id="filterNotAnswered" class="form-check-input">
+                          <label class="form-check-label" for="filterNotAnswered">Not Answered</label>
+                        </div>
+                    
+                        <div class="form-check">
+                          <input type="checkbox" id="filterFlagged" class="form-check-input">
+                          <label class="form-check-label" for="filterFlagged">Flagged</label>
+                        </div>
+                    
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="filterWrong">
+                          <label class="form-check-label" for="filterWrong">Wrong Answers</label>
+                        </div>
+                    
+                    
+                        <button id="applyFilters" class="btn btn-primary btn-sm mt-2">
+                          Apply Filters
+                        </button>
+                    
+                        <button id="clearFilters" class="btn btn-outline-secondary btn-sm mt-2">
+                          Clear Filters
+                        </button>
+                      </div>
+                    
+                    </div> -->
+                    
+                  </div>
+                </div>
+                
+            <!-- <div class="card mb-2">
+              <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                
+
+                
+
+                <div class="text-end">
+                  <div id="timerWrapper" style="display:none;">
+                    <div class="small text-muted mb-1">Time left:</div>
+                    <div class="progress" style="height:10px; width:240px;">
+                      <div id="timerBar" class="progress-bar" role="progressbar" style="width:100%"></div>
+                    </div>
+                    <div id="timeText" class="small mt-1 text-end text-muted">00:00</div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+            
+
+            <form id="quizForm" class="mb-3">
+              <div id="questionsContainer" class="g-3"></div>
+            </form>
+
+            <div class="d-flex justify-content-between mb-3">
+                <button id="prevPage" class="btn btn-primary w-25">Previous</button>
+                <button id="nextPage" class="btn btn-primary w-25">Next</button>
+              </div>
+
+            <nav class="d-flex justify-content-between align-items-center mb-3">
+              
+
+              <div class="text-center">
+                <span class="small text-muted">Page </span><span id="currentPage">1</span>
+                <span class="small text-muted"> of </span><span id="totalPages">1</span>
+              </div>
+
+              <div>
+                <button id="checkBtn" class="btn btn-success">Check Score</button>
+              </div>
+            </nav>
+
+            <div id="result" class="mt-2" style="display:none;"></div>
+          </div>
+
+          <footer class="text-center text-muted small mt-3">Made for practice — responsive layout with Bootstrap 5.3</footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODO Bootstrap JS bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="assets/js/quizLogic.js"></script>
+
+  </body>
+</html>
+
+<!-- TODO Recent edits below -->
+ <!-- 1. Search Option for all questions -->
+  <!-- 2. Timer sound alert 10 seconds left -->
+   <!-- 3. Review answers before final submission -->
+    <!-- 4. Save progress in local storage 
+     filter questions by correct/incorrect/unanswered
+     click on progress dot to jump to question
+     mark questions for review
+     show explanations for answers
+     categorize questions by difficulty
+     track time spent per question
+     adaptive questioning based on performance
+     option to retake only incorrect questions
+     detailed performance analytics
+     option to share results on social media
+     mobile app version
+     option to import/export question sets
+     option to add custom questions
+     multiplayer quiz mode
+     option to randomize answer order
+     option to set passing score
+     option to pause/resume quiz
+     option to print quiz
+     option to change font size
+      option to change color scheme
+      option to enable/disable animations
+      option to enable/disable sound effects
+       option to enable/disable haptic feedback
+        option to set question time limit
+         option to set break intervals
+          option to enable/disable background music
+           option to choose music genre
+            option to adjust music volume
+             option to enable/disable voice narration
+              option to choose narrator voice
+               option to adjust narration speed
+                option to enable/disable hints
+                 option to choose hint frequency
+                  option to enable/disable question timer sound
+                   option to choose timer sound type
+                    option to adjust timer sound volume
+                     option to enable/disable end of quiz sound
+                      option to choose end of quiz sound type
+                       option to adjust end of quiz sound volume
+                        option to enable/disable question transition animations
+                         option to choose question transition animation type
+                          option to adjust question transition animation speed
+                           option to enable/disable answer selection animations
+                            option to choose answer selection animation type
+                             option to adjust answer selection animation speed
+                              option to enable/disable result display animations
+                               option to choose result display animation type
+                                option to adjust result display animation speed
+                                  option to enable/disable progress dot animations
+                                    option to choose progress dot animation type
+                                      option to adjust progress dot animation speed
+-->
