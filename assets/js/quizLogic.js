@@ -139,16 +139,22 @@ const darkModeToggle = document.getElementById('darkModeToggle');
 --------------------------*/
 function loadMasterGroups() {
     masterGroups = {};
+
     groupVars.forEach(gv => {
         const arr = window[gv];
+
         if (Array.isArray(arr)) {
-            // deep clone so shuffling doesn't mutate original
-            masterGroups[gv] = arr.map(q => JSON.parse(JSON.stringify(q)));
+            masterGroups[gv] = arr.map(q => {
+                const cloned = JSON.parse(JSON.stringify(q));
+                cloned.groupName = gv;   // 🔥 attach group name here
+                return cloned;
+            });
         } else {
             masterGroups[gv] = [];
         }
     });
 }
+
 loadMasterGroups();
 
 /* -------------------------
@@ -366,11 +372,23 @@ function renderSingleQuestion(i) {
     const headerRow = document.createElement("div");
     headerRow.className = "d-flex justify-content-between align-items-center mb-2";
 
-    const qTitle = document.createElement("h6");
-    qTitle.className = "card-title mb-0";
-    qTitle.textContent = `Q${i + 1}. ${q.q}`;
+    const titleWrapper = document.createElement("div");
+titleWrapper.className = "d-flex flex-column";
 
-    headerRow.appendChild(qTitle);
+const qTitle = document.createElement("h6");
+qTitle.className = "card-title mb-0";
+qTitle.textContent = `Q${i + 1}. ${q.q}`;
+
+const groupTag = document.createElement("small");
+groupTag.className = "text-muted";
+groupTag.textContent = q.groupName ? `(${q.groupName})` : "";
+// OR: `Group: ${q.groupName}`
+
+titleWrapper.appendChild(qTitle);
+titleWrapper.appendChild(groupTag);
+
+headerRow.appendChild(titleWrapper);
+
 
     const rightControls = document.createElement("div");
     const isFlaggedNow = flagged.has(String(i));
@@ -847,4 +865,5 @@ darkModeToggle.addEventListener("change", () => {
 totalPages = 1;
 updatePageIndicators();
 updateProgressUI();
+
 
