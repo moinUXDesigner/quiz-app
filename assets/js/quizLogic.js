@@ -362,92 +362,94 @@ function renderSingleQuestion(i) {
     const qBody = document.createElement("div");
     qBody.className = "card-body";
 
-    // header with flag button
+    // --- HEADER WITH FLAG BUTTON ---
     const headerRow = document.createElement("div");
     headerRow.className = "d-flex justify-content-between align-items-center mb-2";
+
     const qTitle = document.createElement("h6");
     qTitle.className = "card-title mb-0";
     qTitle.textContent = `Q${i + 1}. ${q.q}`;
+
     headerRow.appendChild(qTitle);
 
-    // flag button (reflect flagged state)
     const rightControls = document.createElement("div");
     const isFlaggedNow = flagged.has(String(i));
     rightControls.innerHTML = `
-        <button type="button" class="btn btn-sm ${isFlaggedNow ? "btn-warning" : "btn-outline-warning"} me-2 flagBtn">Flag</button>
+        <button type="button" 
+                class="btn btn-sm ${isFlaggedNow ? "btn-warning" : "btn-outline-warning"} 
+                me-2 flagBtn">Flag</button>
     `;
     headerRow.appendChild(rightControls);
     qBody.appendChild(headerRow);
 
-// ========================== RENDER OPTIONS ==========================================================
-// Render options (MCQ / match / alphalist)
-        
-        if (q.type === "match") {
-            const table = document.createElement("table");
-            table.className = "table table-bordered mt-2";
+    // ========================== MATCH TYPE ==========================
+    if (q.type === "match") {
+        const table = document.createElement("table");
+        table.className = "table table-bordered mt-2";
 
-            table.innerHTML = `
-                <thead>
-                    <tr><th>List I</th><th>List II</th></tr>
-                </thead>
+        table.innerHTML = `
+            <thead>
+                <tr><th>List I</th><th>List II</th></tr>
+            </thead>
+        `;
+
+        const tbody = document.createElement("tbody");
+        const maxLen = Math.max(q.list1.length, q.list2.length);
+
+        for (let r = 0; r < maxLen; r++) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${q.list1[r] || ""}</td>
+                <td>${q.list2[r] || ""}</td>
             `;
-
-            const tbody = document.createElement("tbody");
-            const maxLen = Math.max(q.list1.length, q.list2.length);
-
-            for (let r = 0; r < maxLen; r++) {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${q.list1[r] || ""}</td>
-                    <td>${q.list2[r] || ""}</td>
-                `;
-                tbody.appendChild(tr);
-            }
-            table.appendChild(tbody);
-            qBody.appendChild(table);
-            
+            tbody.appendChild(tr);
         }
 
-        else if (q.type === "alphalist") {
+        table.appendChild(tbody);
+        qBody.appendChild(table);
+    }
 
-            // Show the list items (A, B, C, D...)
-            const ul = document.createElement("ul");
-            ul.className = "mt-2";
+    // ========================== ALPHALIST TYPE ==========================
+    else if (q.type === "alphalist") {
+        const ul = document.createElement("ul");
+        ul.className = "mt-2";
 
-            (q.list1 || []).forEach(text => {
-                const li = document.createElement("li");
-                li.textContent = text;
-                ul.appendChild(li);
-            });
+        (q.list1 || []).forEach(text => {
+            const li = document.createElement("li");
+            li.textContent = text;
+            ul.appendChild(li);
+        });
 
-            qBody.appendChild(ul);
-        }
+        qBody.appendChild(ul);
+    }
 
-       
+    // ========================== MCQ OPTIONS (ABCD STYLE) ==========================
 
-// options
     const opts = document.createElement("div");
     opts.className = "mt-2";
 
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
     (q.options || []).forEach((opt, optIdx) => {
         const optId = `q${i}_opt${optIdx}`;
+
         const div = document.createElement("div");
-        div.className = "form-check";
+        div.className = "form-check d-flex align-items-center";
 
         const input = document.createElement("input");
-        input.className = "form-check-input";
+        input.className = "form-check-input me-2";
         input.type = "radio";
         input.name = `q${i}`;
         input.id = optId;
         input.value = String(optIdx);
         input.dataset.index = String(optIdx);
 
-        // check if user previously answered
-        if (quizAnswers[`q${i}`] !== undefined && String(quizAnswers[`q${i}`]) === String(optIdx)) {
+        // Restore previous answer
+        if (quizAnswers[`q${i}`] !== undefined &&
+            String(quizAnswers[`q${i}`]) === String(optIdx)) {
             input.checked = true;
         }
 
-        // event listener to save answer
         input.addEventListener("change", () => {
             quizAnswers[`q${i}`] = String(optIdx);
             persistAnswers();
@@ -455,26 +457,27 @@ function renderSingleQuestion(i) {
             updateProgressUI();
         });
 
+        // Label with ABCD prefix
         const label = document.createElement("label");
         label.className = "form-check-label option-label";
-        // ensure proper attribute for query selector later:
         label.setAttribute("for", optId);
-        label.textContent = opt;
+        label.innerHTML = `<strong>${letters[optIdx]}.</strong> ${opt}`;
 
         div.appendChild(input);
         div.appendChild(label);
         opts.appendChild(div);
     });
+
     qBody.appendChild(opts);
-// ========================== RENDER OPTIONS ==========================================================
-    
+
     card.appendChild(qBody);
     container.appendChild(card);
 
-    // attach flag listener
+    // --- FLAG BUTTON TOGGLE ---
     const flagBtn = card.querySelector(".flagBtn");
     flagBtn.addEventListener("click", () => {
         const key = String(i);
+
         if (flagged.has(key)) {
             flagged.delete(key);
             flagBtn.classList.remove("btn-warning");
@@ -486,12 +489,12 @@ function renderSingleQuestion(i) {
             flagBtn.classList.add("btn-warning");
             card.classList.add("flagged");
         }
+
         persistFlags();
         updateDotForIndex(i);
         updateProgressUI();
     });
 }
-
 /* -------------------------
    Render paginated questions
 --------------------------*/
@@ -844,3 +847,4 @@ darkModeToggle.addEventListener("change", () => {
 totalPages = 1;
 updatePageIndicators();
 updateProgressUI();
+
